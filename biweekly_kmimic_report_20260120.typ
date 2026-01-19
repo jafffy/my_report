@@ -159,41 +159,46 @@
     columns: (1fr, 1fr),
     gutter: 20pt,
     [
-      *Pipeline 구축*
-      - Local LLM 대규모 생성 파이프라인
-      - K-MIMIC 데이터 기반 Synthetic Data 생성
+      *Mortality Prediction 결과*
+      #set text(size: 14pt)
+      #table(
+        columns: (auto, auto),
+        stroke: (x, y) => if y == 0 { (bottom: 1pt) } else { none },
+        inset: 5pt,
+        table.header([*Metric*], [*Value*]),
+        [평가 환자 수], [677/991 (31% 데이터 이슈)],
+        [Accuracy], [84.9%],
+        [Precision (death)], [88.7%],
+        [Recall (death)], [32.9%],
+        [Specificity], [98.9% (528/534)],
+      )
 
-      #v(0.5em)
-
-      *Downstream Task 검증*
-      - Mortality Prediction 모델 학습
-      - K-MIMIC Synthetic Data 활용
-
-      #v(0.5em)
+      #v(0.3em)
 
       #block(
         fill: completed.lighten(70%),
-        inset: 10pt,
+        inset: 8pt,
         radius: 4pt,
         width: 100%,
-        text(size: 14pt)[
-          *결과:* MIMIC-III Benchmark와\
-          유사한 성능 달성
+        text(size: 12pt)[
+          *결과:* 높은 Specificity로 생존자 예측 우수
         ]
       )
     ],
     [
-      *진행 현황*
-      - #text(fill: completed)[✓] Local LLM Pipeline 완성
-      - #text(fill: completed)[✓] Synthetic Data 생성 완료
-      - #text(fill: completed)[✓] Mortality Prediction 검증
-      - #text(fill: inprogress)[→] 추가 Downstream Task 검증 예정
+      *Key Observations*
+      #set text(size: 14pt)
+      - High specificity: 생존자 98.9% 정확 식별
+      - Low sensitivity: 사망 예측 32.9%
+      - False negatives: 96명 (사망→생존 예측)
+      - False positives: 6명 (생존→사망 예측)
 
       #v(0.5em)
 
-      *의의*
-      - K-MIMIC 기반 Synthetic Data 품질 확인
-      - 외부 API 의존성 없이 대규모 생성 가능
+      *진행 현황*
+      - #text(fill: completed)[✓] Local LLM Pipeline 완성
+      - #text(fill: completed)[✓] Mortality Prediction 검증
+      - #text(fill: inprogress)[→] 추가 Downstream Task 검증 예정
     ]
   )
 ]
@@ -373,8 +378,8 @@
           *지난 2주 진행 사항*
           #set text(size: 14pt)
           - DEEP-ICU Synthetic Data
-            - #text(size: 12pt)[Local LLM Pipeline 완성]
-            - #text(size: 12pt)[Mortality Prediction 검증 완료]
+            - #text(size: 12pt)[Mortality Prediction: 84.9% Acc]
+            - #text(size: 12pt)[High Specificity (98.9%)]
           - K-MIMIC 도주 환자
             - #text(size: 12pt)[ITEMID 검색 진행 중]
           - K-MIMIC 문제점 정리
