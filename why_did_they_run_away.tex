@@ -1,0 +1,352 @@
+\documentclass[aspectratio=169]{beamer}
+
+% Theme
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+% Packages
+\usepackage{kotex}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning}
+
+% Colors
+\definecolor{completed}{RGB}{34, 139, 34}
+\definecolor{inprogress}{RGB}{70, 130, 180}
+\definecolor{hold}{RGB}{255, 140, 0}
+\definecolor{highlight}{RGB}{128, 0, 128}
+\definecolor{emergency}{RGB}{220, 53, 69}
+\definecolor{mental}{RGB}{147, 112, 219}
+\definecolor{alcohol}{RGB}{255, 193, 7}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Footer
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+      \usebeamerfont{author in head/foot}K-MIMIC Analysis
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+      \usebeamerfont{title in head/foot}Run Away 퇴원 분석
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+      \usebeamerfont{date in head/foot}2025.12.26\hspace*{2em}
+      \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+    \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+% Title information
+\title[Run Away 분석]{K-MIMIC ``Run Away'' 퇴원 분석 보고서}
+\author{최재원}
+\date{2025년 12월 26일}
+\institute{서울대학교병원 융합의학과}
+
+\begin{document}
+
+% ============================================
+% Title Slide
+% ============================================
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ============================================
+% Overview Slide
+% ============================================
+\begin{frame}{개요}
+  \begin{center}
+    \begin{tabular}{l c}
+      \toprule
+      \textbf{항목} & \textbf{수치} \\
+      \midrule
+      총 Run away 케이스 & \textbf{409건} \\
+      관련 병원 수 & 8개 병원 \\
+      가장 많은 병원 & 병원 201 (356건, 87\%) \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{1cm}
+
+  \begin{beamercolorbox}[sep=0.8em,wd=\textwidth,rounded=true,shadow=true]{block body}
+    \centering
+    \large 병원 201에서 전체 Run away의 \textbf{87\%}가 발생
+  \end{beamercolorbox}
+\end{frame}
+
+% ============================================
+% Patient Characteristics
+% ============================================
+\begin{frame}{Run away 환자 기본 특성}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{입원 유형}
+        \small
+        \begin{tabular}{l c c}
+          \toprule
+          \textbf{유형} & \textbf{건수} & \textbf{비율} \\
+          \midrule
+          \textcolor{emergency}{\textbf{응급실}} & \textbf{351건} & \textbf{86\%} \\
+          일반입원 & 50건 & 12\% \\
+          외래 & 5건 & 1\% \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \begin{block}{보험 유형}
+        \small
+        \begin{tabular}{l c c}
+          \toprule
+          \textbf{보험} & \textbf{건수} & \textbf{비율} \\
+          \midrule
+          국민건강보험 & 314건 & 77\% \\
+          medical ins. 1 & 76건 & 19\% \\
+          무보험/기타 & 19건 & 4\% \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.5cm}
+
+  \begin{beamercolorbox}[sep=0.5em,wd=\textwidth,rounded=true]{block title}
+    \centering
+    \textbf{86\%}가 \textcolor{emergency}{응급실} 경유 입원 $\rightarrow$ 비자발적 내원 후 이탈 가능성
+  \end{beamercolorbox}
+\end{frame}
+
+% ============================================
+% Main Diagnosis Categories
+% ============================================
+\begin{frame}{핵심 발견: 병원 201 주진단 대분류 (114건 분석)}
+  \begin{center}
+    \small
+    \begin{tabular}{c l c l}
+      \toprule
+      \textbf{ICD-10} & \textbf{분류} & \textbf{건수} & \textbf{주요 질환} \\
+      \midrule
+      \textcolor{mental}{\textbf{F}} & \textcolor{mental}{\textbf{정신/행동 장애}} & \textcolor{mental}{\textbf{16건}} & 우울증, 알코올의존, 조현병 \\
+      K & 소화기계 & 13건 & \textbf{알코올성 간질환} 포함 \\
+      \textcolor{emergency}{\textbf{T}} & \textcolor{emergency}{\textbf{중독/외인}} & \textcolor{emergency}{\textbf{11건}} & 약물중독, 자해 의심 \\
+      S & 손상 & 10건 & 외상 \\
+      I & 순환기계 & 8건 & 심혈관 질환 \\
+      N & 비뇨생식계 & 8건 & 신장질환 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.5cm}
+
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{beamercolorbox}[sep=0.4em,rounded=true]{block body}
+        \centering
+        \textcolor{mental}{\textbf{F코드 (정신과)}} = 16건
+      \end{beamercolorbox}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{beamercolorbox}[sep=0.4em,rounded=true]{block body}
+        \centering
+        \textcolor{emergency}{\textbf{T코드 (중독/자해)}} = 11건
+      \end{beamercolorbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% Psychiatric Diagnosis Detail
+% ============================================
+\begin{frame}{정신과 진단 상세 (F코드)}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \begin{block}{F코드 상세 분류}
+        \small
+        \begin{tabular}{l l c}
+          \toprule
+          \textbf{코드} & \textbf{진단명} & \textbf{건수} \\
+          \midrule
+          F102 & \textcolor{alcohol}{\textbf{알코올 의존 증후군}} & 4건 \\
+          F321, F329 & \textcolor{mental}{\textbf{우울 에피소드}} & 4건 \\
+          F200, F209 & 조현병 & 2건 \\
+          F411, F419 & 불안장애 & 2건 \\
+          F101, F104 & 알코올 남용/금단 & 2건 \\
+          F603 & 경계성 인격장애 & 1건 \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.42\textwidth}
+      \begin{block}{알코올성 간질환 (K코드)}
+        \small
+        \begin{tabular}{l c}
+          \toprule
+          \textbf{진단명} & \textbf{건수} \\
+          \midrule
+          알코올성 간섬유증/경변 & 2건 \\
+          간부전 & 2건 \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+
+      \vspace{0.3cm}
+
+      \begin{beamercolorbox}[sep=0.4em,rounded=true]{block title}
+        \footnotesize
+        \textbf{알코올 관련} 진단이\\
+        전체의 상당수를 차지
+      \end{beamercolorbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% Poisoning/Self-harm
+% ============================================
+\begin{frame}{중독/자해 관련 (T코드)}
+  \begin{center}
+    \begin{tabular}{l l c}
+      \toprule
+      \textbf{코드} & \textbf{진단명} & \textbf{건수} \\
+      \midrule
+      \textcolor{emergency}{\textbf{T659}} & \textcolor{emergency}{\textbf{상세불명 물질 독작용 (자해의심)}} & \textcolor{emergency}{\textbf{6건}} \\
+      T658 & 기타 물질 독작용 & 1건 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{1cm}
+
+  \begin{beamercolorbox}[sep=1em,wd=\textwidth,rounded=true,shadow=true]{block body}
+    \centering
+    \large
+    T659 (물질 독작용)가 다수 $\rightarrow$ \\
+    \textbf{자해 시도 후 응급실 내원 $\rightarrow$ 이탈 패턴} 의심
+  \end{beamercolorbox}
+\end{frame}
+
+% ============================================
+% Mental Health Summary
+% ============================================
+\begin{frame}{정신건강/알코올 관련 환자 비율 (병원 201)}
+  \begin{center}
+    \begin{tabular}{l c}
+      \toprule
+      \textbf{분류} & \textbf{환자 수} \\
+      \midrule
+      \textcolor{mental}{\textbf{F코드(정신과) 진단 환자}} & \textcolor{mental}{\textbf{22명}} \\
+      \textcolor{alcohol}{\textbf{알코올성 간질환(K70) 환자}} & \textcolor{alcohol}{\textbf{6명}} \\
+      \textbf{중복 제외 추정} & \textbf{$\sim$25명 이상} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{1cm}
+
+  \begin{beamercolorbox}[sep=1em,wd=\textwidth,rounded=true,shadow=true]{block title}
+    \centering
+    \Large
+    진단 기록이 있는 환자 중 \\
+    \textbf{약 20-25\%가 정신건강 또는 알코올 관련 문제}
+  \end{beamercolorbox}
+\end{frame}
+
+% ============================================
+% Hospital Comparison
+% ============================================
+\begin{frame}{병원별 비교}
+  \begin{center}
+    \begin{tabular}{l c l}
+      \toprule
+      \textbf{병원} & \textbf{Run away 수} & \textbf{주요 진단} \\
+      \midrule
+      \textcolor{emergency}{\textbf{201}} & \textcolor{emergency}{\textbf{356건}} & F(정신과), K(간질환), T(중독) \\
+      006 & 24건 & S(손상), I(순환기) \\
+      001 & 7건 & I(순환기), C(암) \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.8cm}
+
+  \begin{beamercolorbox}[sep=0.8em,wd=\textwidth,rounded=true]{block body}
+    \centering
+    병원 201의 Run away 환자는 \textbf{정신과/알코올/중독} 관련 진단 비율이 높음\\
+    $\rightarrow$ 병원 특성 또는 환자군의 차이 가능성
+  \end{beamercolorbox}
+\end{frame}
+
+% ============================================
+% Conclusion
+% ============================================
+\begin{frame}{결론: Run away의 주요 원인 추정}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{\textcolor{mental}{1. 정신건강 문제 (가장 주요)}}
+        \footnotesize
+        \begin{itemize}
+          \item 우울증, 조현병, 불안장애 환자
+          \item 치료 거부 또는 충동적 퇴원
+          \item 병식(insight) 부족으로 인한 자의 퇴원
+        \end{itemize}
+      \end{block}
+
+      \vspace{0.3cm}
+
+      \begin{block}{\textcolor{alcohol}{2. 알코올 관련 문제}}
+        \footnotesize
+        \begin{itemize}
+          \item 알코올 의존/남용 환자의 금단 증상 시 이탈
+          \item 알코올성 간질환 환자의 음주 욕구
+        \end{itemize}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \begin{block}{\textcolor{emergency}{3. 자해/중독 환자}}
+        \footnotesize
+        \begin{itemize}
+          \item T659(물질 독작용)가 다수
+          \item 자해 시도 후 응급실 내원 $\rightarrow$ 이탈 패턴
+        \end{itemize}
+      \end{block}
+
+      \vspace{0.3cm}
+
+      \begin{block}{4. 응급실 특성}
+        \footnotesize
+        \begin{itemize}
+          \item 86\%가 응급실 입원
+          \item 비자발적 내원 후 이탈 가능성
+          \item 대기 시간, 강제 입원 회피 등
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% Q&A
+% ============================================
+\begin{frame}
+  \begin{center}
+    \vspace{2cm}
+    {\Huge \textbf{Q \& A}}
+
+    \vspace{2cm}
+
+    {\Large 감사합니다}
+  \end{center}
+\end{frame}
+
+\end{document}

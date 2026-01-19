@@ -1,0 +1,533 @@
+\documentclass[aspectratio=169]{beamer}
+
+% Theme
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+% Packages
+\usepackage{kotex}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning}
+
+% Colors
+\definecolor{completed}{RGB}{34, 139, 34}
+\definecolor{inprogress}{RGB}{70, 130, 180}
+\definecolor{hold}{RGB}{255, 140, 0}
+\definecolor{highlight}{RGB}{128, 0, 128}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Footer
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+      \usebeamerfont{author in head/foot}최재원
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+      \usebeamerfont{title in head/foot}주간 업무 보고
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+      \usebeamerfont{date in head/foot}2025.12.26\hspace*{2em}
+      \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+    \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+% Title information
+\title[주간 보고]{주간 업무 보고}
+\author{최재원}
+\date{2025년 12월 26일}
+\institute{서울대학교병원 융합의학과}
+
+\begin{document}
+
+% ============================================
+% Title Slide
+% ============================================
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ============================================
+% Overview Slide
+% ============================================
+\begin{frame}{업무 현황 Overview}
+  \begin{table}
+    \small
+    \begin{tabular}{p{10cm} l}
+      \toprule
+      \textbf{프로젝트} & \textbf{상태} \\
+      \midrule
+      의료 프로그램 업무 자동화 매크로 개발 & \textcolor{hold}{\textbf{Hold}} \\
+      SNOMED CT 기반 간호 용어 분류 모델 개발 & \textcolor{completed}{논문 초안 전달 완료} \\
+      SNOMED CT \& LOINC mapping (Human-AI) & \textcolor{inprogress}{연구 계획 중} \\
+      \textbf{DEEP-ICU: Synthetic Data 생성} & \textcolor{highlight}{\textbf{평가 프레임워크 수립}} \\
+      사망 데이터 활용 연구 & \textcolor{completed}{데이터 추출 완료} \\
+      뇌조직 생검술 후 뇌출혈 위험 예측 모델 & \textcolor{completed}{논문 초안 전달 완료} \\
+      ARDS 연구 (김성민 교수님) & \textcolor{completed}{데이터 전달 완료} \\
+      자폐 플랫폼 (김동영 연구원) & \textcolor{inprogress}{논문 초안 writing 중} \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+% ============================================
+% DEEP-ICU Title
+% ============================================
+\begin{frame}
+  \begin{center}
+    \vspace{2cm}
+    {\Huge \textbf{DEEP-ICU}}
+
+    \vspace{0.5cm}
+
+    {\large Domain-Embedded Encodings for\\Personalized ICU outcomes}
+
+    \vspace{1cm}
+
+    {\color{gray} K-MIMIC Synthetic Data Generation}
+  \end{center}
+\end{frame}
+
+% ============================================
+% DEEP-ICU Goal
+% ============================================
+\begin{frame}{DEEP-ICU 목표}
+  \begin{center}
+    \begin{beamercolorbox}[sep=1em,wd=0.9\textwidth,center,rounded=true,shadow=true]{block body}
+      \Large \textbf{K-MIMIC의 Synthetic Data를 생성}하여\\
+      데이터 부족 문제 해결 및 프라이버시 보호
+    \end{beamercolorbox}
+  \end{center}
+
+  \vspace{1cm}
+
+  \textbf{활용 목적:}
+  \begin{itemize}
+    \item 데이터 증강 (Data Augmentation)
+    \item 프라이버시 보호 데이터 공유
+    \item Downstream Task 성능 검증
+  \end{itemize}
+\end{frame}
+
+% ============================================
+% Pipeline Overview
+% ============================================
+\begin{frame}{Synthetic Data 생성 파이프라인}
+  \begin{center}
+    \begin{tikzpicture}[
+      node distance=1.2cm,
+      box/.style={rectangle, rounded corners, minimum width=10cm, minimum height=1.4cm, text centered, draw=black, font=\small, text width=9.5cm, align=center},
+      arrow/.style={thick,->,>=stealth}
+    ]
+
+    \node (step1) [box, fill=green!20] {
+      \textbf{Step 1: ICD Code 생성} \\[2pt]
+      K-MIMIC → \textbf{Halo 모델} → 그럴듯한 ICD codes {\small\color{gray}(이한주 선생님)}
+    };
+
+    \node (step2) [box, fill=orange!20, below=of step1] {
+      \textbf{Step 2: Clinical Events 생성} \\[2pt]
+      ICD codes → \textbf{Claude Sonnet 4.5} → CHARTEVENTS + LABEVENTS
+    };
+
+    \node (step3) [box, fill=blue!20, below=of step2] {
+      \textbf{Step 3: 체계적 검증} \\[2pt]
+      Fidelity / Utility / Privacy / Clinical Validity 평가
+    };
+
+    \draw [arrow] (step1) -- (step2);
+    \draw [arrow] (step2) -- (step3);
+
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+% ============================================
+% Claude Agent SDK
+% ============================================
+\begin{frame}{Step 2: Claude Agent SDK 활용}
+  \small
+  \textbf{Claude Agent SDK}를 사용하여 자율적 데이터 생성
+
+  \vspace{0.3cm}
+
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{생성 대상 (CHARTEVENTS)}
+      \footnotesize
+      \begin{itemize}
+        \setlength{\itemsep}{0pt}
+        \item Capillary refill rate
+        \item Blood pressure (Sys/Dia/Mean)
+        \item GCS (Eye/Motor/Verbal/Total)
+        \item Heart Rate, Respiratory rate
+        \item SpO2, Temperature
+        \item Glucose, pH
+        \item Height, Weight, FiO2
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \textbf{생성 대상 (LABEVENTS)}
+      \footnotesize
+      \begin{itemize}
+        \setlength{\itemsep}{0pt}
+        \item Glucose (50809/50931)
+        \item Oxygen saturation (50817)
+        \item pH (50820)
+      \end{itemize}
+
+      \vspace{0.3cm}
+
+      \textbf{특징}
+      \begin{itemize}
+        \setlength{\itemsep}{0pt}
+        \item 복수 진단 (Comorbidities) 지원
+        \item 시간에 따른 변화 패턴 반영
+        \item 생리학적 일관성 유지
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.3cm}
+
+  \begin{beamercolorbox}[sep=0.4em,wd=\textwidth,rounded=true]{block title}
+    \small \textbf{생성 비용:} 환자 1명당 \textbf{\$0.12} (Claude Sonnet 4.5 기준)
+    \hfill {\footnotesize 1,000명 $\approx$ \$120 / 10,000명 $\approx$ \$1,200}
+  \end{beamercolorbox}
+\end{frame}
+
+% ============================================
+% Generation Process
+% ============================================
+\begin{frame}{생성 프로세스}
+  \begin{center}
+    \begin{tikzpicture}[
+      node distance=0.8cm,
+      box/.style={rectangle, rounded corners, minimum width=9cm, text centered, draw=black, fill=gray!10, font=\ttfamily\small, align=left, inner sep=0.5cm}
+    ]
+
+    \node (code) [box] {
+      \textbf{Input:}  ICD-9 codes + Descriptions\\
+      \hspace{1.5cm}(e.g., CHF + Diabetes + CAD)\\[0.3cm]
+      \textbf{Claude:} 1. D\_ITEMS.csv 탐색 (ITEMID 확인)\\
+      \hspace{1.5cm}2. 질병의 병태생리 분석\\
+      \hspace{1.5cm}3. Comorbidity 상호작용 고려\\
+      \hspace{1.5cm}4. Timeline 기반 데이터 생성\\[0.3cm]
+      \textbf{Output:} CHARTEVENTS.csv + LABEVENTS.csv
+    };
+
+    \end{tikzpicture}
+  \end{center}
+
+  \vspace{0.5cm}
+
+  \textcolor{gray}{\textbf{예시 Comorbidity 조합:}}
+  \begin{itemize}
+    \small
+    \item CHF + CAD + Diabetes (3개 동시)
+    \item AKI + CHF + Anemia (3개 동시)
+    \item CAD + Afib + HTN + Hyperlipidemia (4개 동시)
+  \end{itemize}
+\end{frame}
+
+% ============================================
+% Current Status
+% ============================================
+\begin{frame}{현재 진행 상황}
+  \begin{itemize}
+    \item[\textcolor{completed}{\checkmark}] Synthetic data 생성 파이프라인 구축 완료
+    \item[\textcolor{completed}{\checkmark}] Claude Agent SDK 기반 자동화 구현
+    \item[\textcolor{completed}{\checkmark}] 다양한 Comorbidity 조합 테스트
+    \item[\textcolor{completed}{\checkmark}] Downstream task (Mortality Prediction) 초기 검증 (N=10)
+    \item[\textcolor{inprogress}{$\rightarrow$}] \textbf{생성 스케일업 필요} (10명 $\rightarrow$ 1,000명+)
+  \end{itemize}
+
+  \vspace{0.8cm}
+
+  \begin{beamercolorbox}[sep=0.8em,wd=\textwidth,rounded=true]{block title}
+    \textbf{Next Step:} 대규모 생성 후 체계적 평가 진행 (현재 N=10으로는 통계 검증 불가)
+  \end{beamercolorbox}
+\end{frame}
+
+% ============================================
+% Validation Results
+% ============================================
+\begin{frame}{초기 검증: Mortality Prediction 결과}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \begin{center}
+        \footnotesize
+        \begin{tabular}{c c c c c}
+          \toprule
+          \textbf{Patient} & \textbf{GT} & \textbf{Pred} & \textbf{Confidence} & \\
+          \midrule
+          90010 & SURV & SURV & 0.342 & \textcolor{completed}{\checkmark} \\
+          90011 & SURV & SURV & 0.069 & \textcolor{completed}{\checkmark} \\
+          90012 & DIED & DIED & 0.977 & \textcolor{completed}{\checkmark} \\
+          90013 & SURV & SURV & 0.031 & \textcolor{completed}{\checkmark} \\
+          90014 & SURV & DIED & 0.598 & \textcolor{red}{\texttimes} \\
+          90015 & DIED & DIED & 0.934 & \textcolor{completed}{\checkmark} \\
+          90016 & SURV & SURV & 0.480 & \textcolor{completed}{\checkmark} \\
+          90017 & DIED & DIED & 0.702 & \textcolor{completed}{\checkmark} \\
+          90018 & DIED & DIED & 0.567 & \textcolor{completed}{\checkmark} \\
+          90019 & SURV & SURV & 0.039 & \textcolor{completed}{\checkmark} \\
+          \bottomrule
+        \end{tabular}
+      \end{center}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \begin{center}
+        \small
+        \begin{tabular}{l c}
+          \toprule
+          \textbf{Dataset} & \textbf{Acc} \\
+          \midrule
+          Original MIMIC & 88.45\% \\
+          \textbf{Synthetic} & \textcolor{completed}{\textbf{90.0\%}} \\
+          \bottomrule
+        \end{tabular}
+      \end{center}
+
+      \vspace{0.5cm}
+
+      \begin{beamercolorbox}[sep=0.5em,rounded=true]{block body}
+        \small
+        Synthetic data가\\
+        \textbf{유사한 예측 성능}을 보임\\
+        $\rightarrow$ 체계적 평가 필요
+      \end{beamercolorbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% Evaluation Framework Overview
+% ============================================
+\begin{frame}{Synthetic Data 평가 프레임워크}
+  \begin{center}
+    \begin{tabular}{|c|c|}
+      \hline
+      \cellcolor{green!20}\textbf{1. Statistical Fidelity} & \cellcolor{orange!20}\textbf{2. Utility} \\
+      \cellcolor{green!20}통계적 유사성 & \cellcolor{orange!20}ML 유용성 \\
+      \hline
+      \cellcolor{blue!20}\textbf{3. Privacy} & \cellcolor{purple!20}\textbf{4. Clinical Validity} \\
+      \cellcolor{blue!20}프라이버시 보호 & \cellcolor{purple!20}임상적 타당성 \\
+      \hline
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.5cm}
+
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{\textcolor{completed}{1. Statistical Fidelity}}
+      \begin{itemize}
+        \footnotesize
+        \item 변수별 분포 비교
+        \item 변수 간 상관관계 보존
+        \item 시계열 패턴 유사성
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{\textcolor{hold}{2. Utility (ML Efficacy)}}
+      \begin{itemize}
+        \footnotesize
+        \item TSTR: Train Synthetic, Test Real
+        \item TRTS: Train Real, Test Synthetic
+        \item 다양한 Downstream Tasks
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% Evaluation Methods Detail
+% ============================================
+\begin{frame}{평가 방법 상세}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Statistical Fidelity 평가}
+        \footnotesize
+        \begin{itemize}
+          \item \textbf{분포 비교}
+            \begin{itemize}
+              \scriptsize
+              \item KL Divergence
+              \item Wasserstein Distance
+              \item KS Test (Kolmogorov-Smirnov)
+            \end{itemize}
+          \item \textbf{상관관계}
+            \begin{itemize}
+              \scriptsize
+              \item Correlation Matrix 비교
+              \item Pair-wise 산점도
+            \end{itemize}
+          \item \textbf{시계열}
+            \begin{itemize}
+              \scriptsize
+              \item Autocorrelation 비교
+              \item Trend/Seasonality 패턴
+            \end{itemize}
+        \end{itemize}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Utility 평가 (TSTR/TRTS)}
+        \footnotesize
+        \begin{itemize}
+          \item \textbf{Downstream Tasks}
+            \begin{itemize}
+              \scriptsize
+              \item Mortality Prediction {\color{completed}\checkmark}
+              \item Length of Stay 예측
+              \item Readmission 예측
+              \item Sepsis 조기 예측
+            \end{itemize}
+          \item \textbf{평가 지표}
+            \begin{itemize}
+              \scriptsize
+              \item AUROC, AUPRC
+              \item Sensitivity, Specificity
+              \item Calibration (Brier Score)
+            \end{itemize}
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% Privacy & Clinical Validity
+% ============================================
+\begin{frame}{Privacy \& Clinical Validity 평가}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Privacy 평가}
+        \scriptsize
+        \textbf{목표:} 원본 데이터로부터의 정보 유출 방지
+        \begin{itemize}
+          \setlength{\itemsep}{2pt}
+          \item \textbf{DCR} (Distance to Closest Record)
+            {\tiny -- Synthetic $\leftrightarrow$ Real 거리 측정}
+          \item \textbf{Membership Inference Attack}
+            {\tiny -- 특정 환자의 학습 데이터 포함 여부 추론}
+          \item \textbf{Attribute Inference Attack}
+            {\tiny -- 민감 속성 추론 가능성 평가}
+        \end{itemize}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Clinical Validity 평가}
+        \scriptsize
+        \textbf{목표:} 의학적으로 타당한 데이터인지 검증
+        \begin{itemize}
+          \setlength{\itemsep}{2pt}
+          \item \textbf{임상 규칙 준수}
+            {\tiny -- Vital sign 범위, 생리학적 상호관계}
+          \item \textbf{Expert Review}
+            {\tiny -- 임상의 blind review, Real vs Synthetic 구분}
+          \item \textbf{Disease Progression}
+            {\tiny -- 질병 자연경과, 치료 반응 패턴}
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% Evaluation Roadmap
+% ============================================
+\begin{frame}{평가 로드맵}
+  \small
+  \begin{block}{\textcolor{completed}{Phase 1: 기초 통계 검증} \checkmark 진행 중}
+    \footnotesize 분포 비교, Mortality Prediction 초기 결과
+  \end{block}
+  \vspace{-0.1cm}
+  \centerline{$\Downarrow$}
+  \vspace{-0.1cm}
+  \begin{block}{Phase 2: Utility 확장 검증}
+    \footnotesize LOS, Readmission, Sepsis 등 다양한 Task로 확대
+  \end{block}
+  \vspace{-0.1cm}
+  \centerline{$\Downarrow$}
+  \vspace{-0.1cm}
+  \begin{block}{Phase 3: Privacy 검증}
+    \footnotesize DCR 분석, Membership/Attribute Inference Attack 테스트
+  \end{block}
+  \vspace{-0.1cm}
+  \centerline{$\Downarrow$}
+  \vspace{-0.1cm}
+  \begin{block}{Phase 4: Clinical Validity 검증}
+    \footnotesize 임상 규칙 자동 검증 + Expert Review
+  \end{block}
+\end{frame}
+
+% ============================================
+% Summary
+% ============================================
+\begin{frame}{Summary \& Next Steps}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{이번 주 완료}
+        \begin{itemize}
+          \item 논문 초안 2건 전달
+            \begin{itemize}
+              \small
+              \item 간호 용어 분류 모델
+              \item 뇌출혈 위험 예측 모델
+            \end{itemize}
+          \item ARDS 데이터 전달
+          \item 사망 데이터 추출 완료
+          \item DEEP-ICU
+            \begin{itemize}
+              \small
+              \item Synthetic data 생성 파이프라인 구축
+              \item Mortality Prediction 초기 검증
+            \end{itemize}
+        \end{itemize}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \begin{block}{다음 주 계획}
+        \begin{itemize}
+          \item DEEP-ICU 생성 스케일업
+            \begin{itemize}
+              \small
+              \item 현재 10명 $\rightarrow$ 1,000명+ 목표
+              \item 병렬 생성 파이프라인 구축
+            \end{itemize}
+          \item 생성 후 평가 진행
+          \item SNOMED CT \& LOINC mapping 연구 계획 구체화
+          \item 논문 피드백 반영
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% Q&A
+% ============================================
+\begin{frame}
+  \begin{center}
+    \vspace{2cm}
+    {\Huge \textbf{Q \& A}}
+
+    \vspace{2cm}
+
+    {\Large 감사합니다}
+  \end{center}
+\end{frame}
+
+\end{document}

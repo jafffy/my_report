@@ -1,0 +1,396 @@
+\documentclass[aspectratio=169]{beamer}
+
+% Theme
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+% Packages
+\usepackage{kotex}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning}
+
+% Colors
+\definecolor{completed}{RGB}{34, 139, 34}
+\definecolor{inprogress}{RGB}{70, 130, 180}
+\definecolor{hold}{RGB}{255, 140, 0}
+\definecolor{highlight}{RGB}{128, 0, 128}
+\definecolor{emergency}{RGB}{220, 53, 69}
+\definecolor{mental}{RGB}{147, 112, 219}
+\definecolor{alcohol}{RGB}{255, 193, 7}
+\definecolor{drug}{RGB}{0, 123, 255}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Footer
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+      \usebeamerfont{author in head/foot}MIMIC-IV Analysis
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+      \usebeamerfont{title in head/foot}Run Away 분석
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+      \usebeamerfont{date in head/foot}2025.12.26\hspace*{2em}
+      \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+    \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+% Title information
+\title[Run Away 분석]{MIMIC-IV ``Run Away'' (도망) 퇴원 분석 보고서}
+\author{최재원}
+\date{2025년 12월 26일}
+\institute{서울대학교병원 융합의학과}
+
+\begin{document}
+
+% ============================================
+% Title Slide
+% ============================================
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ============================================
+% Overview Slide
+% ============================================
+\begin{frame}{개요}
+  \begin{center}
+    \begin{tabular}{l c}
+      \toprule
+      \textbf{항목} & \textbf{수치} \\
+      \midrule
+      총 Run away 추정 케이스 & \textbf{322건} \\
+      관련 환자 수 & 322명 \\
+      Against Advice (참고) & 3,393건 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.5cm}
+
+  \begin{beamercolorbox}[sep=0.6em,wd=\textwidth,rounded=true,shadow=true]{block body}
+    \centering
+    MIMIC-IV에는 ``run away'' 코드가 없어 \textbf{Proxy indicator}를 활용하여 추정
+  \end{beamercolorbox}
+\end{frame}
+
+% ============================================
+% Methodology
+% ============================================
+\begin{frame}{도망(Elopement) 추정 방법}
+  \begin{center}
+    \begin{tikzpicture}[
+      node distance=0.8cm,
+      box/.style={rectangle, rounded corners, minimum width=10cm, minimum height=1.2cm, text centered, draw=black, font=\small, text width=9.5cm, align=center},
+      arrow/.style={thick,->,>=stealth}
+    ]
+
+    \node (m1) [box, fill=green!20] {
+      \textbf{방법 1: Z5321 코드} \\[2pt]
+      ``환자가 의료진 만나기 전 떠남'' = \textbf{127건}
+    };
+
+    \node (m2) [box, fill=orange!20, below=of m1] {
+      \textbf{방법 2: 초단기 체류 + AMA} \\[2pt]
+      응급실 체류 < 2시간 + Against Advice = \textbf{33건}
+    };
+
+    \node (m3) [box, fill=blue!20, below=of m2] {
+      \textbf{방법 3: 고위험 정신과 + ED + AMA} \\[2pt]
+      조현병/양극성/인격장애 + 응급실 경유 + AMA = \textbf{169건}
+    };
+
+    \node (total) [box, fill=purple!20, below=of m3] {
+      \textbf{합계 (중복 제외): 322건}
+    };
+
+    \draw [arrow] (m1) -- (m2);
+    \draw [arrow] (m2) -- (m3);
+    \draw [arrow] (m3) -- (total);
+
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+% ============================================
+% Patient Characteristics
+% ============================================
+\begin{frame}{Run away 환자 기본 특성}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{입원 유형}
+        \small
+        \begin{tabular}{l c c}
+          \toprule
+          \textbf{유형} & \textbf{건수} & \textbf{비율} \\
+          \midrule
+          Observation & 137건 & 42.5\% \\
+          \textcolor{emergency}{\textbf{EW EMER.}} & \textcolor{emergency}{\textbf{135건}} & \textcolor{emergency}{\textbf{41.9\%}} \\
+          EU Observation & 30건 & 9.3\% \\
+          기타 & 20건 & 6.3\% \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \begin{block}{보험 유형}
+        \small
+        \begin{tabular}{l c c}
+          \toprule
+          \textbf{보험} & \textbf{건수} & \textbf{비율} \\
+          \midrule
+          \textcolor{emergency}{\textbf{Medicaid}} & \textcolor{emergency}{\textbf{166건}} & \textcolor{emergency}{\textbf{51.6\%}} \\
+          Medicare & 102건 & 31.7\% \\
+          Private & 35건 & 10.9\% \\
+          Other & 5건 & 1.6\% \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.5cm}
+
+  \begin{beamercolorbox}[sep=0.5em,wd=\textwidth,rounded=true]{block title}
+    \centering
+    \textbf{84.4\%}가 응급실/관찰 입원, \textbf{51.6\%}가 \textcolor{emergency}{Medicaid} (저소득층)
+  \end{beamercolorbox}
+\end{frame}
+
+% ============================================
+% Z5321 Analysis
+% ============================================
+\begin{frame}{Z5321 코드 분석 - 진정한 도망 케이스}
+  \begin{center}
+    \begin{beamercolorbox}[sep=0.8em,wd=0.9\textwidth,rounded=true,shadow=true]{block body}
+      \centering
+      \large \textbf{Z5321}: ``Procedure not carried out due to\\patient leaving prior to being seen''\\[5pt]
+      \normalsize 환자가 \textbf{의료진을 만나기 전에 떠남} = 127건
+    \end{beamercolorbox}
+  \end{center}
+
+  \vspace{0.5cm}
+
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Z5321 입원 유형}
+        \small
+        \begin{tabular}{l c}
+          \toprule
+          \textbf{유형} & \textbf{비율} \\
+          \midrule
+          Observation Admit & 41.7\% \\
+          EW EMER. & 23.6\% \\
+          EU Observation & 22.8\% \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Z5321 퇴원 위치}
+        \small
+        \begin{tabular}{l c}
+          \toprule
+          \textbf{위치} & \textbf{비율} \\
+          \midrule
+          Against Advice & 48.8\% \\
+          Home & 22.8\% \\
+          Home Health Care & 6.3\% \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% Psychiatric Diagnosis
+% ============================================
+\begin{frame}{정신과 진단 상세 (F코드)}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \begin{block}{상위 F코드 진단}
+        \footnotesize
+        \begin{tabular}{l l c}
+          \toprule
+          \textbf{코드} & \textbf{진단명} & \textbf{건수} \\
+          \midrule
+          F319 & \textcolor{mental}{\textbf{양극성 장애}} & 109건 \\
+          F17210 & 니코틴 의존 & 102건 \\
+          F419 & \textcolor{mental}{\textbf{불안장애}} & 82건 \\
+          F4310 & \textcolor{mental}{\textbf{PTSD}} & 46건 \\
+          F329 & \textcolor{mental}{\textbf{우울증}} & 39건 \\
+          F10239 & \textcolor{alcohol}{알코올 의존+금단} & 25건 \\
+          F603 & \textcolor{emergency}{\textbf{경계성 인격장애}} & 22건 \\
+          F1410 & \textcolor{drug}{코카인 남용} & 20건 \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.42\textwidth}
+      \begin{block}{고위험 진단군}
+        \footnotesize
+        \begin{itemize}
+          \item \textcolor{mental}{\textbf{F31 양극성}}: 130명
+            {\tiny -- 조증 시 충동적 행동}
+          \item \textcolor{emergency}{\textbf{F60 인격장애}}: 49명
+            {\tiny -- 경계성 인격장애 충동성}
+          \item \textcolor{mental}{\textbf{F20 조현병}}: 19명
+            {\tiny -- 병식 부족}
+        \end{itemize}
+      \end{block}
+
+      \vspace{0.2cm}
+
+      \begin{beamercolorbox}[sep=0.4em,rounded=true]{block title}
+        \footnotesize
+        \textbf{병식 부족} + \textbf{충동성}이\\
+        도망의 핵심 요인
+      \end{beamercolorbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% K-MIMIC vs MIMIC-IV Comparison
+% ============================================
+\begin{frame}{K-MIMIC vs MIMIC-IV 비교}
+  \begin{center}
+    \begin{tabular}{l c c}
+      \toprule
+      \textbf{항목} & \textbf{K-MIMIC} & \textbf{MIMIC-IV} \\
+      \midrule
+      총 Run away 케이스 & 409건 & \textbf{322건} \\
+      응급실 비율 & 86\% & 84.4\% \\
+      \midrule
+      \multicolumn{3}{c}{\textbf{주요 정신과 진단}} \\
+      \midrule
+      1위 & 우울증/알코올의존 & \textcolor{mental}{양극성 장애} \\
+      2위 & 조현병 & 불안장애 \\
+      3위 & 불안장애 & PTSD \\
+      \midrule
+      병원 집중도 & 병원 201 (87\%) & 분산됨 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.3cm}
+
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{beamercolorbox}[sep=0.3em,rounded=true]{block body}
+        \footnotesize
+        \textbf{공통점}: 응급실 비율 높음, 정신과 진단 다수, 알코올/약물 문제
+      \end{beamercolorbox}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{beamercolorbox}[sep=0.3em,rounded=true]{block body}
+        \footnotesize
+        \textbf{차이점}: MIMIC-IV는 양극성 장애 비중 높음, 오피오이드/코카인 포함
+      \end{beamercolorbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% Conclusion
+% ============================================
+\begin{frame}{결론: Run away의 주요 원인}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{\textcolor{mental}{1. 정신건강 문제}}
+        \footnotesize
+        \begin{itemize}
+          \item 양극성 장애 - 조증 삽화 시 충동적 이탈
+          \item 경계성 인격장애 - 충동성
+          \item 조현병 - 병식 부족, 치료 거부
+          \item PTSD/불안 - 병원 환경 회피
+        \end{itemize}
+      \end{block}
+
+      \vspace{0.2cm}
+
+      \begin{block}{\textcolor{alcohol}{2. 알코올/약물 문제}}
+        \footnotesize
+        \begin{itemize}
+          \item 알코올 의존 - 금단 시 음주 욕구
+          \item 오피오이드/코카인 - 약물 갈망
+        \end{itemize}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \begin{block}{3. 사회경제적 요인}
+        \footnotesize
+        \begin{itemize}
+          \item Medicaid 51.6\% (저소득층)
+          \item 대기 시간 불만
+          \item 치료비 우려
+        \end{itemize}
+      \end{block}
+
+      \vspace{0.2cm}
+
+      \begin{block}{\textcolor{emergency}{4. 응급실/관찰병동 특성}}
+        \footnotesize
+        \begin{itemize}
+          \item 84.4\%가 ED/관찰 입원
+          \item 비자발적 내원 후 이탈
+          \item 대기 중 떠남 (Z5321)
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================
+% Limitations
+% ============================================
+\begin{frame}{방법론적 한계}
+  \begin{center}
+    \begin{tabular}{l p{8cm}}
+      \toprule
+      \textbf{한계} & \textbf{설명} \\
+      \midrule
+      직접 코드 부재 & MIMIC-IV에 ``run away'' 코드가 없음 \\
+      Proxy 사용 & Z5321, 단기 체류, 고위험 진단 조합으로 추정 \\
+      과소 추정 가능 & 실제 도망 케이스가 더 많을 수 있음 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.8cm}
+
+  \begin{beamercolorbox}[sep=0.8em,wd=\textwidth,rounded=true,shadow=true]{block body}
+    \centering
+    K-MIMIC의 명시적 ``run away'' 코드와 직접 비교 시 \textbf{주의 필요}\\[5pt]
+    그러나 \textbf{유사한 규모 (409건 vs 322건)}와 \textbf{유사한 특성}을 보임
+  \end{beamercolorbox}
+\end{frame}
+
+% ============================================
+% Q&A
+% ============================================
+\begin{frame}
+  \begin{center}
+    \vspace{2cm}
+    {\Huge \textbf{Q \& A}}
+
+    \vspace{2cm}
+
+    {\Large 감사합니다}
+  \end{center}
+\end{frame}
+
+\end{document}
