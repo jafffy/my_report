@@ -152,6 +152,84 @@
 )
 
 // ============================================
+// DEEP-ICU Pipeline
+// ============================================
+#slide(title: [DEEP-ICU: Synthetic Data 생성 파이프라인])[\
+  #v(0.3em)
+  #align(center)[
+    #block(
+      fill: luma(245),
+      inset: 15pt,
+      radius: 6pt,
+      width: 95%,
+      [
+        #grid(
+          columns: (1fr, auto, 1fr, auto, 1fr),
+          gutter: 8pt,
+          align: center + horizon,
+          [
+            #block(fill: primary.lighten(70%), inset: 10pt, radius: 4pt, width: 100%)[
+              #text(size: 14pt, weight: "bold")[Step 1: ICD 코드 생성]
+              #v(0.3em)
+              #text(size: 12pt)[
+                *Halo 모델* 활용\
+                K-MIMIC 원래 분포 기반\
+                ICD 코드 생성
+              ]
+            ]
+          ],
+          [#text(size: 24pt)[→]],
+          [
+            #block(fill: secondary.lighten(70%), inset: 10pt, radius: 4pt, width: 100%)[
+              #text(size: 14pt, weight: "bold")[Step 2: Clinical Events]
+              #v(0.3em)
+              #text(size: 12pt)[
+                *Local LLM* 활용\
+                Chart Events 생성\
+                Lab Events 생성
+              ]
+            ]
+          ],
+          [#text(size: 24pt)[→]],
+          [
+            #block(fill: completed.lighten(70%), inset: 10pt, radius: 4pt, width: 100%)[
+              #text(size: 14pt, weight: "bold")[Step 3: 검증]
+              #v(0.3em)
+              #text(size: 12pt)[
+                MIMIC-III 학습 모델로\
+                Mortality Prediction\
+                *유사 성능 달성*
+              ]
+            ]
+          ],
+        )
+      ]
+    )
+  ]
+
+  #v(0.5em)
+
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 20pt,
+    [
+      *Halo 모델 (ICD 코드 생성)*
+      #set text(size: 14pt)
+      - K-MIMIC 진단 코드 분포 학습
+      - 환자별 현실적 ICD 코드 조합 생성
+      - 원본 데이터 분포 유지
+    ],
+    [
+      *Local LLM (Clinical Events 생성)*
+      #set text(size: 14pt)
+      - ICD 코드 기반 Chart Events 생성
+      - Lab Events (검사 결과) 생성
+      - Mortality Prediction 입력 형식 준수
+    ]
+  )
+]
+
+// ============================================
 // DEEP-ICU Details
 // ============================================
 #slide(title: [DEEP-ICU: Synthetic Data 검증])[\
@@ -160,14 +238,14 @@
     gutter: 20pt,
     [
       *Pipeline 구축*
-      - Local LLM 대규모 생성 파이프라인
+      - Halo 모델 + Local LLM 조합
       - K-MIMIC 데이터 기반 Synthetic Data 생성
 
       #v(0.5em)
 
       *Downstream Task 검증*
-      - Mortality Prediction 모델 학습
-      - K-MIMIC Synthetic Data 활용
+      - MIMIC-III 기반 Mortality Prediction 모델
+      - K-MIMIC Synthetic Data로 추론
 
       #v(0.5em)
 
@@ -184,6 +262,7 @@
     ],
     [
       *진행 현황*
+      - #text(fill: completed)[✓] Halo 모델 ICD 생성 완료
       - #text(fill: completed)[✓] Local LLM Pipeline 완성
       - #text(fill: completed)[✓] Synthetic Data 생성 완료
       - #text(fill: completed)[✓] Mortality Prediction 검증
