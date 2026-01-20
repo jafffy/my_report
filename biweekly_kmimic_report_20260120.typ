@@ -337,6 +337,8 @@
         [Mortality Rate], [11.12%],
         [Accuracy], [82.3%],
         [AUC-ROC], [*0.8954*],
+        [Precision (death)], [0.37],
+        [Recall (death)], [0.80],
         [F1-score], [0.5019],
       )
 
