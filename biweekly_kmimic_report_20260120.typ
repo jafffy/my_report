@@ -135,7 +135,7 @@
           [*프로젝트*], [*상태*],
         ),
         [DEEP-ICU Synthetic Data], [Downstream Task 검증],
-        [K-MIMIC 도주 환자], [ITEMID 검색],
+        [K-MIMIC 도주 환자], [코호트 구축 완료],
         [K-MIMIC 문제점 정리], [리스트 작성],
       )
     ]
@@ -254,26 +254,26 @@
       #v(0.3em)
 
       #block(
-        fill: completed.lighten(70%),
+        fill: hold.lighten(70%),
         inset: 8pt,
         radius: 4pt,
         width: 100%,
         text(size: 12pt)[
-          *결과:* 높은 Specificity로 생존자 예측 우수
+          *한계:* 클래스 불균형 (생존 79%)으로 해석 주의 필요
         ]
       )
     ],
     [
-      *Key Observations*
       #set text(size: 14pt)
-      - High specificity: 생존자 98.9% 정확 식별
-      - Low sensitivity: 사망 예측 32.9%
-      - False negatives: 96명 (사망→생존 예측)
-      - False positives: 6명 (생존→사망 예측)
+      #text(size: 20pt, weight: "bold")[Key Observations]
+      - Baseline (모두 생존 예측): 78.9% Acc
+      - 현재 모델: +6%p 향상 (84.9%)
+      - 사망 예측 recall 32.9%로 낮음
+      - 추가 지표 (AUROC, F1) 필요
 
       #v(0.5em)
 
-      *진행 현황*
+      #text(size: 20pt, weight: "bold")[진행 현황]
       - #text(fill: completed)[✓] Halo 모델 ICD 생성 완료
       - #text(fill: completed)[✓] Local LLM Pipeline 완성
       - #text(fill: completed)[✓] Synthetic Data 생성 완료
@@ -288,53 +288,93 @@
 // ============================================
 #section-slide(
   title: [K-MIMIC 도주 환자 연구],
-  subtitle: [ICU 도주 환자 특성 분석],
-  note: [ITEMID 기반 데이터 추출]
+  subtitle: [ICU 도주 환자 특성 및 위험 요인 분석],
+  note: [전체 병원 도주 환자 코호트 구축 완료]
 )
 
 // ============================================
-// K-MIMIC 도주 환자 Details
+// K-MIMIC 도주 환자 진행 현황
 // ============================================
 #slide(title: [K-MIMIC 도주 환자: 진행 현황])[\
   #grid(
     columns: (1fr, 1fr),
     gutter: 20pt,
     [
-      *현재 진행 상황*
-      - K-MIMIC에서 도주 환자 데이터 추출
-      - 관련 ITEMID 검색 중
-
-      #v(0.5em)
-
-      *데이터 추출 목표*
-      - 도주 환자 기본 정보
-      - 관련 임상 변수 (바이탈, 검사 결과)
-      - 도주 전후 이벤트 데이터
+      *완료 사항*
+      - #text(fill: completed)[✓] 전체 병원 도주 환자 필터링 완료
+      - #text(fill: completed)[✓] 도주 환자 코호트 구축
 
       #v(0.5em)
 
       #block(
-        fill: inprogress.lighten(70%),
+        fill: completed.lighten(70%),
         inset: 10pt,
         radius: 4pt,
         width: 100%,
         text(size: 14pt)[
-          *상태:* ITEMID 매핑 작업 진행 중
+          *상태:* 코호트 필터링 완료\
+          다음 단계 진행 준비
         ]
       )
     ],
     [
       *다음 단계*
-      - #text(fill: inprogress)[→] ITEMID 목록 확정
-      - #text(fill: inprogress)[→] 데이터 추출 쿼리 작성
-      - #text(fill: inprogress)[→] 코호트 정의 및 추출
+      - #text(fill: inprogress)[→] 코호트 기술통계 산출
+      - #text(fill: inprogress)[→] 임상 변수 ITEMID 매핑
+      - #text(fill: inprogress)[→] 대조군 설정 및 매칭
 
       #v(0.5em)
 
-      *예상 분석*
+      *연구 목표*
       - 도주 환자 특성 분석
       - 위험 요인 도출
       - 예방 방안 제시
+    ]
+  )
+]
+
+// ============================================
+// K-MIMIC 도주 환자 연구 계획
+// ============================================
+#slide(title: [K-MIMIC 도주 환자: 연구 계획])[\
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 20pt,
+    [
+      #set text(size: 14pt)
+      #text(size: 20pt, weight: "bold")[1. 코호트 정의 및 기술통계]
+      - 도주 정의 기준 명확화
+      - 전체 환자 수, 병원별 분포
+      - 인구통계 (나이, 성별, 입원 경로)
+
+      #v(0.3em)
+
+      #text(size: 20pt, weight: "bold")[2. 임상 변수 추출]
+      - 바이탈: HR, BP, BT, RR, SpO2
+      - 의식 상태: GCS, 진정제 사용
+      - Lab: 전해질, 간/신기능
+      - 중증도: APACHE, SOFA
+      - 투약: 진정제, 진통제, 억제대
+    ],
+    [
+      #set text(size: 14pt)
+      #text(size: 20pt, weight: "bold")[3. 시간 관련 변수]
+      - ICU 재원 기간 (도주 시점까지)
+      - 도주 발생 시간대 (주/야간, 요일)
+      - 입원 후 도주까지 경과 시간
+
+      #v(0.3em)
+
+      #text(size: 20pt, weight: "bold")[4. 대조군 설정]
+      - 비도주 환자 중 매칭 대조군 선정
+      - 매칭 기준: 나이, 성별, 중증도, 진단
+
+      #v(0.3em)
+
+      #text(size: 20pt, weight: "bold")[5. 분석 계획]
+      - Univariate 특성 비교
+      - Logistic regression (위험 요인)
+      - 도주 후 예후 분석
     ]
   )
 ]
@@ -459,9 +499,9 @@
           #set text(size: 14pt)
           - DEEP-ICU Synthetic Data
             - #text(size: 12pt)[Mortality Prediction: 84.9% Acc]
-            - #text(size: 12pt)[High Specificity (98.9%)]
+            - #text(size: 12pt)[Baseline 대비 +6%p, 추가 검증 필요]
           - K-MIMIC 도주 환자
-            - #text(size: 12pt)[ITEMID 검색 진행 중]
+            - #text(size: 12pt)[전체 병원 코호트 필터링 완료]
           - K-MIMIC 문제점 정리
             - #text(size: 12pt)[리스트 작성 중]
           - ARDS 연구
@@ -482,7 +522,8 @@
             - #text(size: 12pt)[추가 Downstream Task 검증]
             - #text(size: 12pt)[논문 작성 준비]
           - K-MIMIC 도주 환자
-            - #text(size: 12pt)[ITEMID 확정 및 데이터 추출]
+            - #text(size: 12pt)[기술통계 산출 및 임상 변수 추출]
+            - #text(size: 12pt)[대조군 설정 및 분석 시작]
           - K-MIMIC 문제점 정리
             - #text(size: 12pt)[문제점 리스트 완성]
             - #text(size: 12pt)[해결 방안 제안]
