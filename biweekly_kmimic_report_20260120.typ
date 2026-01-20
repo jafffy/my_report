@@ -135,6 +135,7 @@
           [*프로젝트*], [*상태*],
         ),
         [DEEP-ICU Synthetic Data], [Downstream Task 검증],
+        [FastText Embeddings], [Temporal 확장 검증],
         [K-MIMIC 도주 환자], [코호트 구축 완료],
         [K-MIMIC 문제점 정리], [리스트 작성],
       )
@@ -225,6 +226,211 @@
       - ICD 코드 기반 Chart Events 생성
       - Lab Events (검사 결과) 생성
       - Mortality Prediction 입력 형식 준수
+    ]
+  )
+]
+
+// ============================================
+// FastText Embeddings Pipeline
+// ============================================
+#slide(title: [FastText Embeddings: 파이프라인])[\
+  #v(0.3em)
+  #align(center)[
+    #block(
+      fill: luma(245),
+      inset: 15pt,
+      radius: 6pt,
+      width: 95%,
+      [
+        #grid(
+          columns: (1fr, auto, 1fr, auto, 1fr, auto, 1fr),
+          gutter: 6pt,
+          align: center + horizon,
+          [
+            #block(fill: primary.lighten(70%), inset: 8pt, radius: 4pt, width: 100%)[
+              #text(size: 12pt, weight: "bold")[Clinical Events]
+              #v(0.2em)
+              #text(size: 10pt)[
+                17 Vital Signs\
+                36 Lab Tests
+              ]
+            ]
+          ],
+          [#text(size: 20pt)[→]],
+          [
+            #block(fill: secondary.lighten(70%), inset: 8pt, radius: 4pt, width: 100%)[
+              #text(size: 12pt, weight: "bold")[Tokenization]
+              #v(0.2em)
+              #text(size: 10pt)[
+                측정값 이산화\
+                이벤트 시퀀스 생성
+              ]
+            ]
+          ],
+          [#text(size: 20pt)[→]],
+          [
+            #block(fill: hold.lighten(70%), inset: 8pt, radius: 4pt, width: 100%)[
+              #text(size: 12pt, weight: "bold")[FastText]
+              #v(0.2em)
+              #text(size: 10pt)[
+                Skipgram 학습\
+                128차원 임베딩
+              ]
+            ]
+          ],
+          [#text(size: 20pt)[→]],
+          [
+            #block(fill: completed.lighten(70%), inset: 8pt, radius: 4pt, width: 100%)[
+              #text(size: 12pt, weight: "bold")[Evaluation]
+              #v(0.2em)
+              #text(size: 10pt)[
+                Mortality Pred.\
+                XGBoost 분류
+              ]
+            ]
+          ],
+        )
+      ]
+    )
+  ]
+
+  #v(0.5em)
+
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 20pt,
+    [
+      *데이터 특성*
+      #set text(size: 14pt)
+      - ICU 입실 후 첫 48시간 데이터
+      - 17개 Vital Signs (HR, BP, SpO2 등)
+      - 36개 Lab Tests (CBC, BMP 등)
+      - MIMIC-IV 85,243 ICU stays
+    ],
+    [
+      *임베딩 방법*
+      #set text(size: 14pt)
+      - FastText Skipgram 모델
+      - 128차원 환자 임베딩 생성
+      - 이벤트 임베딩 평균 → 환자 벡터
+      - Mortality 예측 downstream task
+    ]
+  )
+]
+
+// ============================================
+// FastText Results
+// ============================================
+#slide(title: [FastText Embeddings: 결과])[\
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 20pt,
+    [
+      *Mortality Prediction 결과*
+      #set text(size: 14pt)
+      #table(
+        columns: (auto, auto),
+        stroke: (x, y) => if y == 0 { (bottom: 1pt) } else { none },
+        inset: 5pt,
+        table.header([*Metric*], [*Value*]),
+        [Dataset], [85,243 ICU stays],
+        [Mortality Rate], [11.12%],
+        [Accuracy], [82.3%],
+        [AUC-ROC], [*0.8954*],
+        [F1-score], [0.5019],
+      )
+
+      #v(0.3em)
+
+      #block(
+        fill: completed.lighten(70%),
+        inset: 8pt,
+        radius: 4pt,
+        width: 100%,
+        text(size: 12pt)[
+          *AUC-ROC 0.8954*: 임베딩이 mortality 예측에 유의미한 신호 포착
+        ]
+      )
+    ],
+    [
+      #set text(size: 14pt)
+      #text(size: 20pt, weight: "bold")[Key Findings]
+      - 첫 48시간 데이터만으로 높은 예측력
+      - AUC-ROC 0.8954 달성
+      - F1 0.50은 클래스 불균형 영향
+      - Synthetic Data 대비 우수한 성능
+
+      #v(0.5em)
+
+      #text(size: 20pt, weight: "bold")[진행 현황]
+      - #text(fill: completed)[✓] MIMIC-IV 코호트 구축
+      - #text(fill: completed)[✓] FastText 임베딩 학습
+      - #text(fill: completed)[✓] Mortality Prediction 검증
+      - #text(fill: inprogress)[→] Temporal 확장 평가 예정
+    ]
+  )
+]
+
+// ============================================
+// FastText Temporal Extension
+// ============================================
+#slide(title: [FastText Temporal: 시간 정보 확장])[\
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 20pt,
+    [
+      *Temporal Encoding 방식*
+      #set text(size: 14pt)
+      #table(
+        columns: (auto, auto),
+        stroke: (x, y) => if y == 0 { (bottom: 1pt) } else { none },
+        inset: 5pt,
+        table.header([*Mode*], [*설명*]),
+        [bucket], [시간을 구간으로 이산화],
+        [marker], [시간 마커 토큰 삽입],
+        [relative], [상대적 시간 간격 인코딩],
+        [combined], [bucket + marker 결합],
+        [none], [시간 정보 없음 (baseline)],
+      )
+
+      #v(0.3em)
+
+      #block(
+        fill: inprogress.lighten(70%),
+        inset: 8pt,
+        radius: 4pt,
+        width: 100%,
+        text(size: 12pt)[
+          *목표:* "언제" 이벤트가 발생했는지 정보 활용
+        ]
+      )
+    ],
+    [
+      #set text(size: 14pt)
+      #text(size: 20pt, weight: "bold")[기대 효과]
+      - 이벤트 발생 시점 정보 반영
+      - 시간에 따른 패턴 변화 포착
+      - 임상적으로 중요한 temporal dynamics
+
+      #v(0.5em)
+
+      #text(size: 20pt, weight: "bold")[현재 상태]
+      - #text(fill: completed)[✓] Temporal 코호트 생성 완료
+      - #text(fill: completed)[✓] 5가지 encoding 모드 구현
+      - #text(fill: inprogress)[→] 평가 진행 중
+      - #text(fill: inprogress)[→] 성능 비교 분석 예정
+
+      #v(0.3em)
+
+      #block(
+        fill: luma(240),
+        inset: 6pt,
+        radius: 4pt,
+        width: 100%,
+        text(size: 11pt)[
+          *검증 계획:* 각 temporal mode별 AUC-ROC 비교
+        ]
+      )
     ]
   )
 ]
@@ -446,10 +652,11 @@
           - DEEP-ICU Synthetic Data
             - #text(size: 12pt)[Mortality Prediction: 84.9% Acc]
             - #text(size: 12pt)[Baseline 대비 +6%p, 추가 검증 필요]
+          - FastText Embeddings
+            - #text(size: 12pt)[AUC-ROC 0.8954 달성]
+            - #text(size: 12pt)[Temporal 확장 코호트 구축 완료]
           - K-MIMIC 도주 환자
             - #text(size: 12pt)[전체 병원 코호트 필터링 완료]
-          - K-MIMIC 문제점 정리
-            - #text(size: 12pt)[리스트 작성 중]
           - ARDS 연구
             - #text(size: 12pt)[데이터 전달 완료]
         ]
@@ -467,12 +674,12 @@
           - DEEP-ICU 후속 작업
             - #text(size: 12pt)[추가 Downstream Task 검증]
             - #text(size: 12pt)[논문 작성 준비]
+          - FastText Temporal 평가
+            - #text(size: 12pt)[5가지 temporal mode 성능 비교]
+            - #text(size: 12pt)[시간 정보 효과 검증]
           - K-MIMIC 도주 환자
             - #text(size: 12pt)[기술통계 산출 및 임상 변수 추출]
             - #text(size: 12pt)[대조군 설정 및 분석 시작]
-          - K-MIMIC 문제점 정리
-            - #text(size: 12pt)[문제점 리스트 완성]
-            - #text(size: 12pt)[해결 방안 제안]
         ]
       )
     ]
